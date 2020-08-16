@@ -25,33 +25,6 @@ that need guaranteed execution. You can learn more by reading the
 or doing the
 [WorkManager Codelab](https://codelabs.developers.google.com/codelabs/android-workmanager).
 
-Pre-requisites
---------------
-
-* Android Studio 3.6 or later and you know how to use it.
-
-* Make sure Android Studio is updated, as well as your SDK and Gradle.
-Otherwise, you may have to wait for a while until all the updates are done.
-
-* A device or emulator that runs API level 16+
-
-You need to be solidly familiar with the Kotlin programming language,
-object-oriented design concepts, and Android Development Fundamentals.
-In particular:
-
-* Basic layouts, widgets and [View Bindings](https://d.android.com/topic/libraries/view-binding)
-* Some familiarity with Uris and File I/O
-* Familiarity with [LiveData](https://developer.android.com/topic/libraries/architecture/livedata)
-  and [ViewModel](https://developer.android.com/topic/libraries/architecture/viewmodel)
-
-Getting Started
----------------
-
-1. [Install Android Studio](https://developer.android.com/studio/install.html),
-if you don't already have it.
-2. Download the sample.
-2. Import the sample into Android Studio.
-3. Build and run the sample.
 
 License
 -------
