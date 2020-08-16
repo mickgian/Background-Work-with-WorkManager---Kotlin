@@ -16,10 +16,13 @@
 
 package com.example.background
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.work.WorkInfo
 import com.bumptech.glide.Glide
 import com.example.background.databinding.ActivityBlurBinding
 
@@ -43,7 +46,57 @@ class BlurActivity : AppCompatActivity() {
             Glide.with(this).load(imageUri).into(binding.imageView)
         }
 
+        // Show work status
+        viewModel.outputWorkInfos.observe(this, workInfosObserver())
+
         binding.goButton.setOnClickListener { viewModel.applyBlur(blurLevel) }
+
+        // Setup view output image file button
+        binding.seeFileButton.setOnClickListener {
+            viewModel.outputUri?.let { currentUri ->
+                val actionView = Intent(Intent.ACTION_VIEW, currentUri)
+                actionView.resolveActivity(packageManager)?.run {
+                    startActivity(actionView)
+                }
+            }
+        }
+
+        binding.cancelButton.setOnClickListener { viewModel.cancelWork() }
+    }
+
+    private fun workInfosObserver(): Observer<List<WorkInfo>> {
+        return Observer { listOfWorkInfo ->
+
+            // Note that these next few lines grab a single WorkInfo if it exists
+            // This code could be in a Transformation in the ViewModel; they are included here
+            // so that the entire process of displaying a WorkInfo is in one location.
+
+            // If there are no matching work info, do nothing
+            if (listOfWorkInfo.isNullOrEmpty()) {
+                return@Observer //the Go button has not been clicked yet, so return.
+            }
+
+            // We only care about the one output status.
+            // Every continuation has only one worker tagged TAG_OUTPUT
+            val workInfo = listOfWorkInfo[0]    //Get the first because we made the chain of work unique.
+
+            if (workInfo.state.isFinished) {
+                showWorkFinished()
+
+                // Normally this processing, which is not directly related to drawing views on
+                // screen would be in the ViewModel. For simplicity we are keeping it here.
+                val outputImageUri = workInfo.outputData.getString(KEY_IMAGE_URI)
+
+                // If there is an output file show "See File" button
+                if (!outputImageUri.isNullOrEmpty()) {
+                    viewModel.setOutputUri(outputImageUri as String)
+                    binding.seeFileButton.visibility = View.VISIBLE
+                }
+
+            } else {
+                showWorkInProgress()
+            }
+        }
     }
 
     /**
@@ -77,4 +130,6 @@ class BlurActivity : AppCompatActivity() {
                 R.id.radio_blur_lv_3 -> 3
                 else -> 1
             }
+
+
 }
